@@ -11,24 +11,33 @@
 					<th>&nbsp;</th>
 				</tr>
 			</thead>
-			<f:for each="{users}" key="index" as="user">
+			<f:for each="{usersWithMeta}" key="index" as="userInfo">
 				<tr>
-					<td>{user.name.fullName}</td>
+					<td>{userInfo.user.name.fullName}</td>
 					<td>
-						<f:for each="{user.accounts}" as="account">
+						<f:for each="{userInfo.user.accounts}" as="account">
 							<i class="fas fa-user icon-white"></i>{account.accountIdentifier} <f:render partial="Module/Shared/Roles" arguments="{roles: account.roles}" />
 						</f:for>
 					</td>
 					<td class="neos-action">
 						<div class="neos-pull-right">
-							<f:link.action action="show" arguments="{user: user}" class="neos-button neos-button-primary" title="{neos:backend.translate(id: 'users.tooltip.view', source: 'Modules', package: 'Neos.Neos')}" additionalAttributes="{data-neos-toggle: 'tooltip'}">
+							<f:link.action action="show" arguments="{user: userInfo.user}" class="neos-button neos-button-primary" title="{neos:backend.translate(id: 'users.tooltip.view', source: 'Modules', package: 'Neos.Neos')}" additionalAttributes="{data-neos-toggle: 'tooltip'}">
 								<i class="fas fa-info-circle icon-white"></i>
 							</f:link.action>
-							<f:link.action action="edit" arguments="{user: user}" class="neos-button neos-button-primary" title="{neos:backend.translate(id: 'users.tooltip.edit', source: 'Modules', package: 'Neos.Neos')}" additionalAttributes="{data-neos-toggle: 'tooltip'}">
-								<i class="fas fa-pencil-alt icon-white"></i>
-							</f:link.action>
+							<f:if condition="{userInfo.isEditingAllowed}">
+								<f:then>
+									<f:link.action action="edit" arguments="{user: userInfo.user}" class="neos-button neos-button-primary" title="{neos:backend.translate(id: 'users.tooltip.edit', source: 'Modules', package: 'Neos.Neos')}" additionalAttributes="{data-neos-toggle: 'tooltip'}">
+										<i class="fas fa-pencil-alt icon-white"></i>
+									</f:link.action>
+								</f:then>
+								<f:else>
+									<button class="neos-button neos-button-primary neos-disabled" title="{neos:backend.translate(id: 'users.tooltip.edit', source: 'Modules', package: 'Neos.Neos')}" data-neos-toggle="tooltip">
+										<i class="fas fa-pencil-alt icon-white"></i>
+									</button>
+								</f:else>
+							</f:if>
 
-							<f:if condition="{currentUser} === {user}">
+							<f:if condition="{userInfo.isCurrentUser} || !{userInfo.isEditingAllowed}">
 								<f:then>
 									<button class="neos-button neos-button-danger neos-disabled" title="{neos:backend.translate(id: 'users.tooltip.cannotDeleteYourself', source: 'Modules', package: 'Neos.Neos')}" data-neos-toggle="tooltip"><i class="fas fa-trash-alt icon-white"></i></button>
 								</f:then>
@@ -42,7 +51,7 @@
 												<div class="neos-modal-header">
 													<button type="button" class="neos-close neos-button" data-dismiss="modal"></button>
 													<div class="neos-header">
-														<neos:backend.translate id="users.message.reallyDelete" arguments="{0:user.name}" source="Modules" package="Neos.Neos"/>
+														<neos:backend.translate id="users.message.reallyDelete" arguments="{0:userInfo.user.name}" source="Modules" package="Neos.Neos"/>
 													</div>
 													<div>
 														<div class="neos-subheader">
@@ -55,7 +64,7 @@
 												</div>
 												<div class="neos-modal-footer">
 													<a href="#" class="neos-button" data-dismiss="modal">{neos:backend.translate(id: 'cancel', value: 'Cancel')}</a>
-													<f:form action="delete" arguments="{user: user}" class="neos-inline">
+													<f:form action="delete" arguments="{user: userInfo.user}" class="neos-inline">
 														<button type="submit" class="neos-button neos-button-danger" title="{neos:backend.translate(id: 'users.tooltip.delete', source: 'Modules', package: 'Neos.Neos')}">
 															<neos:backend.translate id="users.message.confirmDelete" source="Modules" package="Neos.Neos"/>
 														</button>
